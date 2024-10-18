@@ -1,0 +1,82 @@
+{% extends 'partials/base.html' %}
+{% block title %}Products Page{% endblock %}
+{%block content %}
+{% load crispy_forms_tags %}
+{% include 'partials/topnav.html' %}
+<div class = "container">
+<div class="row my-4">
+    <div class="col-md-4">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        <div class="card card-body">
+            <h5>Add New Books</h5>
+            <hr>
+            <form method="POST">
+                {% csrf_token %}
+                  {{form|crispy}}
+                <input class="btn btn-success btn-block" type="submit" value="Add">
+            </form>
+            <!-- Add this to your template -->
+</form>
+        </div>
+           
+          <form class = " container mt-5" method = "POST" enctype = "multipart/form-data">
+            {% csrf_token %}
+            <h2> Upload  csv file </h2>
+            <input type = "file" name = "file" class = "mt-5">
+            <br>
+            <button type = "submit" class = "btn btn-success">Upload</button>
+          </form>
+    
+    </div>
+    <div class="col-md-8">
+        <form method="post" action="{% url 'export_data_to_excel_from_product' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Export Excel File</button>
+        </form>
+        <table class="table bg-white">
+            <thead class="bg-info text-white">
+                <tr>
+                    <th scope="col">Book Name</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Activity</th>
+                    <th ><!-- Add this to your template -->
+                        <form method="get" action="{% url 'dashboard-products' %}">
+                            <label for="sort_by">Sort by:</label>
+                            <select id="sort_by" name="sort_by">
+                                <option value="name" {% if current_sort == 'Bookname' %}selected{% endif %}>Name</option>
+                                <option value="quantity" {% if current_sort == 'quantity' %}selected{% endif %}>Quantity</option>
+                                <option value="category" {% if current_sort == 'category' %}selected{% endif %}>Category</option>
+                            </select>
+                            <button type="submit">Sort</button>
+                        </form>
+                    <th> 
+                    </th>    
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.Bookname }}</td>
+                    <td>{{ item.category }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>
+                        <a class="btn btn-info btn-sm mr-2"
+                            href="{% url 'dashboard-product-update' item.id %}">Edit</a>
+                        <a class="btn btn-danger btn-sm ml-2"
+                            href="{% url 'dashboard-product-delete' item.id %}">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock%}
